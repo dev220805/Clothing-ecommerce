@@ -1,6 +1,6 @@
 /**
  * Vercel build step for the API project (no compilation).
- * Verifies serverless entries resolve before deploy.
+ * Verifies the single serverless entry resolves before deploy.
  */
 import { access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -14,13 +14,11 @@ async function assertExists(relativePath) {
 }
 
 try {
-  await assertExists('api/_handler.js');
   await assertExists('api/index.js');
-  await assertExists('api/[[...path]].js');
   await assertExists('src/app.js');
   await assertExists('public/index.html');
-  await import('../api/_handler.js');
-  console.log('[build] API entries verified');
+  await import('../api/index.js');
+  console.log('[build] API entry verified (single api/index.js)');
 } catch (err) {
   console.error('[build] API verification failed:', err.message);
   process.exit(1);

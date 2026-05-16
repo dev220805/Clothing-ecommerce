@@ -36,7 +36,7 @@ export default function ProductDetailPage() {
           setColor(v0.color);
         }
       })
-      .catch(() => toast.error('Product not found'))
+      .catch((err) => toast.error(err.userMessage || err.response?.data?.message || 'Product not found'))
       .finally(() => setLoading(false));
   }, [slug]);
 

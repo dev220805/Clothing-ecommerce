@@ -25,7 +25,7 @@ export default function RegisterPage() {
       toast.success('Account created — check email for verification');
       navigate('/');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed');
+      toast.error(err.userMessage || err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }

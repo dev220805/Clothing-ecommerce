@@ -52,7 +52,9 @@ const allowVercelFrontends =
   (process.env.VERCEL === '1' || process.env.ALLOW_VERCEL_FRONTENDS === 'true');
 
 export const env = {
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv:
+    process.env.NODE_ENV ||
+    (process.env.VERCEL_ENV === 'production' ? 'production' : 'development'),
   port: Number(process.env.PORT) || 5000,
   clientUrl: clientOrigins[0],
   clientOrigins,

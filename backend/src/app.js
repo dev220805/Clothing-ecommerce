@@ -6,10 +6,14 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import mongoSanitize from 'express-mongo-sanitize';
 import { env } from './config/env.js';
+import { connectDB } from './config/db.js';
+import { validateEnv } from './config/env.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
 import { vercelPathFix } from './middleware/vercelPathFix.js';
 import { corsOrigin } from './lib/corsOrigins.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+
+validateEnv();
 
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -26,14 +30,15 @@ app.set('trust proxy', 1);
 
 app.use(vercelPathFix);
 
-app.use(
-  cors({
-    origin: corsOrigin,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+const corsOptions = {
+  origin: corsOrigin,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(compression());
@@ -46,6 +51,17 @@ if (env.nodeEnv !== 'production') {
 }
 app.use(apiLimiter);
 
+if (process.env.VERCEL) {
+  app.use(async (req, res, next) => {
+    try {
+      await connectDB();
+      next();
+    } catch (err) {
+      next(err);
+    }
+  });
+}
+
 app.get('/', (req, res) => {
   res.redirect(302, '/api/health');
 });
@@ -55,9 +71,23 @@ app.get('/api/health', (req, res) => {
     ok: true,
     service: 'atlas-commerce-api',
     env: env.nodeEnv,
+    vercelEnv: process.env.VERCEL_ENV || null,
     crossOriginAuth: env.isCrossOriginAuth,
     corsOrigins: env.clientOrigins,
     allowVercelFrontends: env.allowVercelFrontends,
+    routing: 'single-api-index',
+  });
+});
+
+/** Debug routing on Vercel (remove in production if desired). */
+app.get('/api/diag', (req, res) => {
+  res.json({
+    ok: true,
+    url: req.url,
+    originalUrl: req.originalUrl,
+    path: req.path,
+    method: req.method,
+    vercel: !!process.env.VERCEL,
   });
 });
 

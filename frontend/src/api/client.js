@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { store } from '@/app/store';
 import { clearAuth, setCredentials } from '@/features/authSlice';
+import { attachApiErrorMessage } from '@/lib/apiErrors';
 
 /** Ensure production calls hit /api/* (common mistake: backend host without /api suffix). */
 function resolveApiBaseUrl(raw) {
@@ -61,8 +62,23 @@ api.interceptors.response.use(
         store.dispatch(clearAuth());
       }
     }
-    return Promise.reject(error);
+    if (import.meta.env.DEV) {
+      console.error('[Atlas API]', attachApiErrorMessage(error).userMessage, error);
+    }
+    return Promise.reject(attachApiErrorMessage(error));
   }
 );
+
+/** Quick connectivity check — call from console: apiHealthCheck() */
+export async function apiHealthCheck() {
+  try {
+    const { data } = await api.get('/health');
+    console.info('[Atlas API] OK', data);
+    return data;
+  } catch (e) {
+    console.error('[Atlas API] Failed', e.userMessage || e.message);
+    throw e;
+  }
+}
 
 export default api;

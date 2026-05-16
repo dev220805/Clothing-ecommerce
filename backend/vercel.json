@@ -5,6 +5,7 @@
   "installCommand": "npm install",
   "buildCommand": "npm run build",
   "rewrites": [
+    { "source": "/api/:path*", "destination": "/api" },
     { "source": "/auth/:path*", "destination": "/api/auth/:path*" },
     { "source": "/products", "destination": "/api/products" },
     { "source": "/products/:path*", "destination": "/api/products/:path*" },
@@ -22,7 +23,7 @@
     { "source": "/listings", "destination": "/api/listings" }
   ],
   "functions": {
-    "api/**/*.js": {
+    "api/index.js": {
       "memory": 1024,
       "maxDuration": 10,
       "includeFiles": "src/**"

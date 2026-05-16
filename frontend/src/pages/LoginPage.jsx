@@ -26,7 +26,7 @@ export default function LoginPage() {
       toast.success('Welcome back');
       navigate(from, { replace: true });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      toast.error(err.userMessage || err.response?.data?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
