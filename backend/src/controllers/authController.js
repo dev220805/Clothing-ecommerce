@@ -7,12 +7,20 @@ import { sendMail } from '../utils/sendEmail.js';
 import { env } from '../config/env.js';
 
 const REFRESH_COOKIE = 'refreshToken';
+
 const cookieOpts = (maxAgeMs) => ({
   httpOnly: true,
-  secure: env.nodeEnv === 'production',
-  sameSite: env.nodeEnv === 'production' ? 'strict' : 'lax',
+  secure: env.nodeEnv === 'production' || env.isCrossOriginAuth,
+  sameSite: env.cookieSameSite,
   maxAge: maxAgeMs,
   path: '/',
+});
+
+const clearCookieOpts = () => ({
+  path: '/',
+  httpOnly: true,
+  secure: env.nodeEnv === 'production' || env.isCrossOriginAuth,
+  sameSite: env.cookieSameSite,
 });
 
 function parseDurationMs(expiresStr) {
@@ -103,7 +111,7 @@ export const refresh = asyncHandler(async (req, res) => {
   try {
     decoded = verifyRefreshToken(token);
   } catch {
-    res.clearCookie(REFRESH_COOKIE, { path: '/' });
+    res.clearCookie(REFRESH_COOKIE, clearCookieOpts());
     throw new ApiError(401, 'Invalid refresh token');
   }
 
@@ -113,7 +121,7 @@ export const refresh = asyncHandler(async (req, res) => {
   const hashed = hashToken(token);
   const match = user.refreshTokens?.find((t) => t.tokenHash === hashed && t.expiresAt > new Date());
   if (!match) {
-    res.clearCookie(REFRESH_COOKIE, { path: '/' });
+    res.clearCookie(REFRESH_COOKIE, clearCookieOpts());
     throw new ApiError(401, 'Refresh token revoked');
   }
 
@@ -142,7 +150,7 @@ export const logout = asyncHandler(async (req, res) => {
       await user.save();
     }
   }
-  res.clearCookie(REFRESH_COOKIE, { path: '/' });
+  res.clearCookie(REFRESH_COOKIE, clearCookieOpts());
   res.json({ success: true, message: 'Logged out' });
 });
 
@@ -152,7 +160,7 @@ export const logoutAll = asyncHandler(async (req, res) => {
     user.refreshTokens = [];
     await user.save();
   }
-  res.clearCookie(REFRESH_COOKIE, { path: '/' });
+  res.clearCookie(REFRESH_COOKIE, clearCookieOpts());
   res.json({ success: true });
 });
 
@@ -193,7 +201,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
   user.refreshTokens = [];
   await user.save();
 
-  res.clearCookie(REFRESH_COOKIE, { path: '/' });
+  res.clearCookie(REFRESH_COOKIE, clearCookieOpts());
   res.json({ success: true, message: 'Password updated. Please log in again.' });
 });
 

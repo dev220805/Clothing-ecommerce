@@ -24,17 +24,8 @@ app.set('trust proxy', 1);
 
 function corsOrigin(origin, callback) {
   if (!origin) return callback(null, true);
-  const allowed = new Set([env.clientUrl]);
-  if (process.env.CLIENT_URL) {
-    allowed.add(process.env.CLIENT_URL.replace(/\/$/, ''));
-  }
-  if (process.env.VERCEL_URL) {
-    allowed.add(`https://${process.env.VERCEL_URL}`);
-  }
-  if (process.env.VERCEL_BRANCH_URL) {
-    allowed.add(`https://${process.env.VERCEL_BRANCH_URL}`);
-  }
-  if (allowed.has(origin)) return callback(null, true);
+  const normalized = origin.replace(/\/$/, '');
+  if (env.clientOrigins.includes(normalized)) return callback(null, true);
   callback(new Error(`CORS blocked for origin: ${origin}`));
 }
 
@@ -53,11 +44,22 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(mongoSanitize());
-app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
+if (env.nodeEnv !== 'production') {
+  app.use(morgan('dev'));
+}
 app.use(apiLimiter);
 
+app.get('/', (req, res) => {
+  res.redirect(302, '/api/health');
+});
+
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, service: 'atlas-commerce-api', env: env.nodeEnv });
+  res.json({
+    ok: true,
+    service: 'atlas-commerce-api',
+    env: env.nodeEnv,
+    crossOriginAuth: env.isCrossOriginAuth,
+  });
 });
 
 app.use('/api/auth', authRoutes);

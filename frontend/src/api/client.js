@@ -2,8 +2,16 @@ import axios from 'axios';
 import { store } from '@/app/store';
 import { clearAuth, setCredentials } from '@/features/authSlice';
 
+const baseURL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+
+if (import.meta.env.PROD && baseURL === '/api') {
+  console.warn(
+    '[Atlas] VITE_API_URL is not set. On Vercel, set it to your backend URL, e.g. https://your-api.vercel.app/api'
+  );
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });

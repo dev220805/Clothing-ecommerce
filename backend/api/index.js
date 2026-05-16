@@ -4,19 +4,22 @@ import { validateEnv } from '../src/config/env.js';
 
 validateEnv();
 
-let dbReady = false;
+/** Vercel serverless: allow longer cold starts on Pro; Hobby max is 10s */
+export const config = {
+  maxDuration: 10,
+};
 
 export default async function handler(req, res) {
   try {
-    if (!dbReady) {
-      await connectDB();
-      dbReady = true;
-    }
+    await connectDB();
     return app(req, res);
   } catch (err) {
-    console.error('[api]', err);
+    console.error('[vercel-api]', err);
     if (!res.headersSent) {
-      res.status(500).json({ success: false, message: 'Server error' });
+      res.status(500).json({
+        success: false,
+        message: process.env.NODE_ENV === 'production' ? 'Server error' : err.message,
+      });
     }
   }
 }
