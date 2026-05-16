@@ -36,9 +36,14 @@ npm run seed
 | `NODE_ENV` | `production` |
 | `CLIENT_URL` | Leave empty for now; set after frontend deploy |
 
-6. Deploy. Test: open `https://YOUR-API.vercel.app/api/health` → `{ "ok": true }`.
+6. Deploy. Wait until the deployment shows **Ready** (green) in the Vercel **Deployments** tab.
 
-Copy the API base URL: `https://YOUR-API.vercel.app/api`
+7. Test the **backend** production URL (from **Settings → Domains** on the **API** project — it is **not** the same as the frontend URL):
+
+   - `https://YOUR-API-PROJECT.vercel.app/api/health` → `{ "ok": true }`
+   - Opening the root `https://YOUR-API-PROJECT.vercel.app/` redirects to `/api/health`
+
+Copy the API base URL: `https://YOUR-API-PROJECT.vercel.app/api`
 
 ---
 
@@ -73,6 +78,7 @@ Cookies and CORS are configured automatically when the frontend and API hosts di
 
 | Problem | Fix |
 |---------|-----|
+| **`404` / `DEPLOYMENT_NOT_FOUND` on backend URL** | That URL has **no successful deployment**. Open the **backend** Vercel project → **Deployments** → fix the failed build or promote a **Ready** deployment. Use the API project domain (e.g. `atlas-api-xxx.vercel.app`), **not** the frontend domain (`clothing-ecommerce-xxx.vercel.app`). |
 | **`npm error Missing script: "build"`** | **Root Directory** must be `backend`. Redeploy after pulling latest `backend/package.json` (includes `npm run build`). |
 | **No Output Directory / wrong framework** | API project: **Framework** = Other, **Output Directory** = leave **empty** (not `dist`). |
 | Build runs from repo root | Set **Root Directory** to `frontend` or `backend` |

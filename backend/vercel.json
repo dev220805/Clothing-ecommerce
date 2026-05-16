@@ -4,9 +4,8 @@
   "framework": null,
   "installCommand": "npm install",
   "buildCommand": "npm run build",
-  "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
   "functions": {
-    "api/index.js": {
+    "api/**/*.js": {
       "memory": 1024,
       "maxDuration": 10,
       "includeFiles": "src/**"
