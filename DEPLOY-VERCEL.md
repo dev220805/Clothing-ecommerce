@@ -73,12 +73,24 @@ Cookies and CORS are configured automatically when the frontend and API hosts di
 
 | Problem | Fix |
 |---------|-----|
+| **`npm error Missing script: "build"`** | **Root Directory** must be `backend`. Redeploy after pulling latest `backend/package.json` (includes `npm run build`). |
+| **No Output Directory / wrong framework** | API project: **Framework** = Other, **Output Directory** = leave **empty** (not `dist`). |
 | Build runs from repo root | Set **Root Directory** to `frontend` or `backend` |
 | Frontend calls wrong API | Set `VITE_API_URL` to full backend URL ending in `/api` |
 | CORS / login fails | Set `CLIENT_URL` on backend to exact frontend origin; redeploy API |
 | `MONGODB_URI` errors | Atlas IP allowlist `0.0.0.0/0`; check user/password in URI |
 | API 500 on cold start | First request may be slow; check Vercel **Functions** logs |
 | `maxDuration` error on Hobby | Limited to 10s (already set in `api/index.js`) |
+
+### Backend project settings (Vercel dashboard)
+
+| Setting | Value |
+|---------|--------|
+| Root Directory | `backend` |
+| Framework Preset | **Other** |
+| Build Command | `npm run build` (or leave blank to use `backend/vercel.json`) |
+| Output Directory | **empty** |
+| Install Command | `npm install` |
 
 ---
 

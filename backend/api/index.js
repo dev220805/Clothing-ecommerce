@@ -4,7 +4,7 @@ import { validateEnv } from '../src/config/env.js';
 
 validateEnv();
 
-/** Vercel serverless: allow longer cold starts on Pro; Hobby max is 10s */
+/** Vercel serverless: Hobby max 10s */
 export const config = {
   maxDuration: 10,
 };
@@ -12,7 +12,7 @@ export const config = {
 export default async function handler(req, res) {
   try {
     await connectDB();
-    return app(req, res);
+    app(req, res);
   } catch (err) {
     console.error('[vercel-api]', err);
     if (!res.headersSent) {
