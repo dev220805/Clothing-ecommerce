@@ -59,6 +59,7 @@ app.get('/api/health', (req, res) => {
     service: 'atlas-commerce-api',
     env: env.nodeEnv,
     crossOriginAuth: env.isCrossOriginAuth,
+    corsOrigins: env.clientOrigins,
   });
 });
 

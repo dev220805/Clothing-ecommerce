@@ -4,6 +4,23 @@
   "framework": null,
   "installCommand": "npm install",
   "buildCommand": "npm run build",
+  "rewrites": [
+    { "source": "/auth/:path*", "destination": "/api/auth/:path*" },
+    { "source": "/products", "destination": "/api/products" },
+    { "source": "/products/:path*", "destination": "/api/products/:path*" },
+    { "source": "/cart/:path*", "destination": "/api/cart/:path*" },
+    { "source": "/cart", "destination": "/api/cart" },
+    { "source": "/wishlist/:path*", "destination": "/api/wishlist/:path*" },
+    { "source": "/wishlist", "destination": "/api/wishlist" },
+    { "source": "/orders/:path*", "destination": "/api/orders/:path*" },
+    { "source": "/orders", "destination": "/api/orders" },
+    { "source": "/admin/:path*", "destination": "/api/admin/:path*" },
+    { "source": "/admin", "destination": "/api/admin" },
+    { "source": "/uploads/:path*", "destination": "/api/uploads/:path*" },
+    { "source": "/uploads", "destination": "/api/uploads" },
+    { "source": "/listings/:path*", "destination": "/api/listings/:path*" },
+    { "source": "/listings", "destination": "/api/listings" }
+  ],
   "functions": {
     "api/**/*.js": {
       "memory": 1024,

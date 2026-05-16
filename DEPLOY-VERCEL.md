@@ -57,7 +57,7 @@ Copy the API base URL: `https://YOUR-API-PROJECT.vercel.app/api`
 
 | Variable | Value |
 |----------|--------|
-| `VITE_API_URL` | `https://YOUR-API.vercel.app/api` (no trailing slash) |
+| `VITE_API_URL` | `https://YOUR-API.vercel.app/api` (**must include `/api`** — e.g. `https://clothing-ecommerce-wlsp.vercel.app/api`) |
 
 6. Deploy. Open the frontend URL and sign in.
 
@@ -83,7 +83,8 @@ Cookies and CORS are configured automatically when the frontend and API hosts di
 | **No Output Directory / wrong framework** | API project: **Framework** = Other, **Output Directory** = leave **empty** (not `dist`). |
 | Build runs from repo root | Set **Root Directory** to `frontend` or `backend` |
 | Frontend calls wrong API | Set `VITE_API_URL` to full backend URL ending in `/api` |
-| CORS / login fails | Set `CLIENT_URL` on backend to exact frontend origin; redeploy API |
+| CORS / login fails | Set `CLIENT_URL` on backend to exact frontend origin (e.g. `https://clothing-ecommerce-iota-ashy.vercel.app`); redeploy API. Check `/api/health` → `corsOrigins` includes your frontend URL. |
+| Requests go to `/auth/login` not `/api/auth/login` | Set `VITE_API_URL` with **`/api` suffix**; redeploy **frontend**. Wrong URL returns 404 with no CORS headers → browser shows "blocked by CORS". |
 | `MONGODB_URI` errors | Atlas IP allowlist `0.0.0.0/0`; check user/password in URI |
 | API 500 on cold start | First request may be slow; check Vercel **Functions** logs |
 | `maxDuration` error on Hobby | Limited to 10s (already set in `api/index.js`) |

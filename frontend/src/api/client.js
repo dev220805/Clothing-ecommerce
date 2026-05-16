@@ -2,11 +2,26 @@ import axios from 'axios';
 import { store } from '@/app/store';
 import { clearAuth, setCredentials } from '@/features/authSlice';
 
-const baseURL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+/** Ensure production calls hit /api/* (common mistake: backend host without /api suffix). */
+function resolveApiBaseUrl(raw) {
+  const trimmed = (raw || '/api').trim().replace(/\/$/, '');
+  if (!trimmed || trimmed === '/api') return '/api';
+  if (trimmed.endsWith('/api')) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return `${trimmed}/api`;
+  return trimmed;
+}
+
+const baseURL = resolveApiBaseUrl(import.meta.env.VITE_API_URL);
 
 if (import.meta.env.PROD && baseURL === '/api') {
   console.warn(
     '[Atlas] VITE_API_URL is not set. On Vercel, set it to your backend URL, e.g. https://your-api.vercel.app/api'
+  );
+}
+
+if (import.meta.env.PROD && import.meta.env.VITE_API_URL && !import.meta.env.VITE_API_URL.replace(/\/$/, '').endsWith('/api')) {
+  console.warn(
+    `[Atlas] VITE_API_URL should end with /api (got "${import.meta.env.VITE_API_URL}"). Using "${baseURL}".`
   );
 }
 
