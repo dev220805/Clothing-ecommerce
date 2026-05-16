@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 import mongoSanitize from 'express-mongo-sanitize';
 import { env } from './config/env.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
+import { vercelPathFix } from './middleware/vercelPathFix.js';
+import { corsOrigin } from './lib/corsOrigins.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 import authRoutes from './routes/authRoutes.js';
@@ -22,12 +24,7 @@ const app = express();
 
 app.set('trust proxy', 1);
 
-function corsOrigin(origin, callback) {
-  if (!origin) return callback(null, true);
-  const normalized = origin.replace(/\/$/, '');
-  if (env.clientOrigins.includes(normalized)) return callback(null, true);
-  callback(new Error(`CORS blocked for origin: ${origin}`));
-}
+app.use(vercelPathFix);
 
 app.use(
   cors({
@@ -60,6 +57,7 @@ app.get('/api/health', (req, res) => {
     env: env.nodeEnv,
     crossOriginAuth: env.isCrossOriginAuth,
     corsOrigins: env.clientOrigins,
+    allowVercelFrontends: env.allowVercelFrontends,
   });
 });
 

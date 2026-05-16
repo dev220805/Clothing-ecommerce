@@ -83,7 +83,8 @@ Cookies and CORS are configured automatically when the frontend and API hosts di
 | **No Output Directory / wrong framework** | API project: **Framework** = Other, **Output Directory** = leave **empty** (not `dist`). |
 | Build runs from repo root | Set **Root Directory** to `frontend` or `backend` |
 | Frontend calls wrong API | Set `VITE_API_URL` to full backend URL ending in `/api` |
-| CORS / login fails | Set `CLIENT_URL` on backend to exact frontend origin (e.g. `https://clothing-ecommerce-iota-ashy.vercel.app`); redeploy API. Check `/api/health` → `corsOrigins` includes your frontend URL. |
+| CORS / login fails | Set `CLIENT_URL` to your current frontend URL; redeploy API. By default, any `https://*.vercel.app` origin is allowed on Vercel (`allowVercelFrontends: true` in `/api/health`). |
+| New frontend URL each deploy (`-ap55`, `-iota`, etc.) | Either rely on default `*.vercel.app` CORS allowance, or add each URL to `ALLOWED_ORIGINS`. |
 | Requests go to `/auth/login` not `/api/auth/login` | Set `VITE_API_URL` with **`/api` suffix**; redeploy **frontend**. Wrong URL returns 404 with no CORS headers → browser shows "blocked by CORS". |
 | `MONGODB_URI` errors | Atlas IP allowlist `0.0.0.0/0`; check user/password in URI |
 | API 500 on cold start | First request may be slow; check Vercel **Functions** logs |

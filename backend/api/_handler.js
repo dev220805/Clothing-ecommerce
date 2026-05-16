@@ -11,6 +11,12 @@ export const config = {
 export default async function handler(req, res) {
   try {
     await connectDB();
+    if (process.env.VERCEL && req.url && !req.url.split('?')[0].startsWith('/api')) {
+      const pathOnly = req.url.split('?')[0];
+      if (/^\/(auth|products|cart|wishlist|orders|admin|uploads|listings)(\/|$)/.test(pathOnly)) {
+        req.url = `/api${req.url}`;
+      }
+    }
     app(req, res);
   } catch (err) {
     console.error('[vercel-api]', err);

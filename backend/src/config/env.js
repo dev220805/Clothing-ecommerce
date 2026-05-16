@@ -46,11 +46,17 @@ function resolveCookieSameSite() {
 
 const clientOrigins = resolveClientOrigins();
 
+/** Default on Vercel: allow any https *.vercel.app (preview URLs change per deploy). Set ALLOW_VERCEL_FRONTENDS=false to disable. */
+const allowVercelFrontends =
+  process.env.ALLOW_VERCEL_FRONTENDS !== 'false' &&
+  (process.env.VERCEL === '1' || process.env.ALLOW_VERCEL_FRONTENDS === 'true');
+
 export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: Number(process.env.PORT) || 5000,
   clientUrl: clientOrigins[0],
   clientOrigins,
+  allowVercelFrontends,
   cookieSameSite: resolveCookieSameSite(),
   isCrossOriginAuth: resolveCookieSameSite() === 'none',
   mongoUri: process.env.MONGODB_URI,
